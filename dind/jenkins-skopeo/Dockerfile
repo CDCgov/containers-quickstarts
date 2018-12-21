@@ -1,7 +1,7 @@
 
 FROM registry.access.redhat.com/openshift3/jenkins-slave-base-rhel7
 
-MAINTAINER Raffaele Spazzoli <rspazzol@redhat.com>
+MAINTAINER Tim Taylor <mpx1@cdc.gov>
 
 # Labels consumed by Red Hat build service
 LABEL com.redhat.component="jenkins-slave-skopeo-rhel7" \
@@ -25,6 +25,7 @@ COPY /policy.json /etc/containers/
 RUN chown -R 1001:0 $HOME && \
     chmod -R g+rw $HOME && \
     curl -L -o /usr/bin/skopeo $SKOPEO_BIN && \
+    chmod +x /usr/bin/skopeo && \
     chown -R 1001:0 /etc/containers && \
     chmod -R g+rw /etc/containers
 
