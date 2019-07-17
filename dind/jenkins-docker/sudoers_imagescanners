@@ -1,0 +1,5 @@
+## Scanning tools
+Cmnd_Alias SECURITY = /bin/oscap-docker
+
+## Give jnlp container user access to oscap-docker command
+#1001 ALL=(#0) NOPASSWD: SECURITY

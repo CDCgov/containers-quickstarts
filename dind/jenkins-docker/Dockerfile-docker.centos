@@ -1,0 +1,22 @@
+# Completely arbitrary starting image, only needs to be able to install Docker and sudo
+FROM centos:centos7
+
+USER root
+
+# Install docker and sudo packages
+RUN INSTALL_PKGS="docker sudo" && \
+    yum update -y && \
+    yum install -y $INSTALL_PKGS && \
+    rpm -V $INSTALL_PKGS && \
+    yum clean all -y
+
+VOLUME /var/lib/docker /var/run
+
+RUN ln -s /usr/libexec/docker/docker-runc-current /usr/bin/docker-runc && \
+    adduser -u 1001 docker && \
+    usermod -aG root docker
+
+# Allows the container to run dockerd as root without being root
+COPY sudoers_dockerdaemon /etc/sudoers.d/dockerd_addon
+
+USER 1001

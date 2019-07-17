@@ -1,0 +1,30 @@
+# Completely arbitrary starting image, only needs to be able to install Docker and sudo
+FROM registry.access.redhat.com/rhel7:7.6
+
+USER root
+
+# Install docker and sudo packages
+RUN ls -la /etc/yum.repos.d && \
+    yum clean all -y && \
+    yum-config-manager --disable "*" && \
+    yum-config-manager --enable rhel-7-server-rpms rhel-7-server-optional-rpms rhel-7-server-extras-rpms rhel-7-server-ose-3.9-rpms && \
+    INSTALL_PKGS="docker sudo" && \
+    yum update -y && \
+    yum install -y $INSTALL_PKGS && \
+    rpm -V $INSTALL_PKGS && \
+    yum clean all -y
+
+# /var/lib/docker needs to be linked to slave's /var/lib/docker for OpenSCAP scan to work (and needs to be a volume anyway for memory reasons)
+# /var/run/docker.sock is the internal docker socket, imitates slave having native internal docker socket by mounting /var/run across the two containers
+VOLUME /var/lib/docker /var/run
+
+# runc needs location for OpenSCAP scan
+# User 1001 needs entry in /etc/passwd for sudo to work, even with NOPASSWD
+RUN ln -s /usr/libexec/docker/docker-runc-current /usr/bin/docker-runc && \
+    adduser -u 1001 docker && \
+    usermod -aG root docker
+
+# Allows the container to run dockerd as root without being root
+COPY sudoers_dockerdaemon /etc/sudoers.d/dockerd_addon
+
+USER 1001
