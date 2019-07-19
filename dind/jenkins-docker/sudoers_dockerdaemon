@@ -1,5 +1,5 @@
 ## Scanning Tools
-CMnd_Alias DOCKER_DAEMON = /bin/dockerd
+Cmnd_Alias DOCKER_DAEMON = /bin/dockerd
 
 ## Give docker container user access to dockerd command
 #1001 ALL=(#0) NOPASSWD: DOCKER_DAEMON
