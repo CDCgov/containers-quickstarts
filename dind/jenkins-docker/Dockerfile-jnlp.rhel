@@ -38,6 +38,7 @@ VOLUME /var/lib/docker /var/run
 
 # Puts onto the machine the script responsible for converting HTML report into pipeline results
 COPY report-parser.py /usr/local/bin/
+RUN chmod +x /usr/local/bin/report-parser.py
 
 # Allows the container user to run oscap-docker scan as root without being root
 COPY sudoers_imagescanners /etc/sudoers.d/imagescanners
