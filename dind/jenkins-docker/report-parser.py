@@ -37,7 +37,12 @@ for i in range(len(levels)):
     vuln_data[levels[i]]["grace"] = int(sys.argv[i+2])
 
 # Parsing and processing unpatched vulnerabilities
-unpatched_vulns = subprocess.check_output(["grep", "-A", "3", "true", sys.argv[1]])
+try:
+    unpatched_vulns = subprocess.check_output(["grep", "-A", "3", "true", sys.argv[1]])
+except CalledProcessError:
+    print("No vulnerabilities found! Exiting...")
+    sys.exit(0)
+
 vuln_list = unpatched_vulns.split("--")
 for vuln in vuln_list:
     level_name = re.search("\([^)]+\)", vuln).group()[1:-1]
@@ -48,9 +53,9 @@ for vuln in vuln_list:
         rhsa_link = re.search("https://access.redhat.com/errata/[^\"]+\"", vuln).group()[:-1]
         redhat_html = subprocess.check_output(["curl", "-s", rhsa_link])
         redhat_errata_date_string = re.search("[^\"]\d{4}-\d{2}-\d{2}", redhat_html).group()[-10:]
-        redhat_errata_date_datetime = datetime.datetime.strptime(vuln_exposure_date_string, "%Y-%m-%d")
+        redhat_errata_date_datetime = datetime.datetime.strptime(redhat_errata_date_string, "%Y-%m-%d")
         current_datetime = datetime.datetime.now()
-        vuln_exposure_days = (current_datetime - vuln_exposure_date_datetime).days
+        vuln_exposure_days = (current_datetime - redhat_errata_date_datetime).days
         if vuln_exposure_days > vuln_data[level_name]["grace"]:
             vuln_data[level_name]["expired_count"] += 1
             any_expired = True
