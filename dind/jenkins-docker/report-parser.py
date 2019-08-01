@@ -39,7 +39,7 @@ for i in range(len(levels)):
 # Parsing and processing unpatched vulnerabilities
 try:
     unpatched_vulns = subprocess.check_output(["grep", "-A", "3", "true", sys.argv[1]])
-except CalledProcessError:
+except subprocess.CalledProcessError:
     print("No vulnerabilities found! Exiting...")
     sys.exit(0)
 
